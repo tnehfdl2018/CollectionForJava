@@ -91,6 +91,22 @@
         }
       });
     }
+
+    function excel() {
+      $.ajax({
+        type: "get",
+        url: "excel", // 정렬기준, 순서를 보낸다.
+        success: function (data) {
+          console.log(data);
+
+        },
+        error: function (data) {
+          console.log(data);
+          return;
+        }
+      });
+
+    }
   </script>
 </head>
 <body>
@@ -104,6 +120,7 @@
           <input type="text" id="inputCoin" placeholder="주문통화를 입력하세요." style="width: 15%">
           <input type="text" id="payMent" placeholder="결제통화를 입력하세요." value="KRW" style="width: 15%">
           <input type="submit" value="검색" style="width: 5%" onclick="coinSearch()">
+          <input type="submit" value="엑셀" style="width: 5%" onclick="excel()">
         </div>
         <div class="card-body">
           <div class="table-responsive">

@@ -1,5 +1,9 @@
 package com.soobineey.collectionforjava;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -9,15 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 @Controller
 public class MainController {
@@ -45,6 +48,7 @@ public class MainController {
   @GetMapping("searchCoin")
   @ResponseBody
   public ArrayList<HashMap<Integer, String>> getBithumbAPI(@RequestParam("inputCoin") String orderCurrency, @RequestParam("payMent") String paymentCurrency) {
+    returnData.clear();
 
     if (orderCurrency == null || paymentCurrency == null) {
       throw  new NullPointerException();
@@ -90,8 +94,8 @@ public class MainController {
           String asksPrice = (String) object.get("price");
           String asksQuantity = (String) object.get("quantity");
           // String에 담았던 숫자를 int, Double로 변환
-          int iAsksPrice = Integer.parseInt(asksPrice);
-          Double dAsksQuantity = Double.valueOf(asksQuantity);
+//          int iAsksPrice = Integer.parseInt(asksPrice);
+//          Double dAsksQuantity = Double.valueOf(asksQuantity);
 
           // 천단위마다 ,(콤마) 추가
 //          asksPriceHashMap.put(asksIndex, String.format("%,d", iAsksPrice));
@@ -104,8 +108,8 @@ public class MainController {
           object = (JSONObject) bidsJsonArray.get(bidsIndex);
           String bidsPrice = (String) object.get("price");
           String bidsQuantity = (String) object.get("quantity");
-          int iBidsPrice = Integer.parseInt(bidsPrice);
-          Double dBidsQuantity = Double.valueOf(bidsQuantity);
+//          int iBidsPrice = Integer.parseInt(bidsPrice);
+//          Double dBidsQuantity = Double.valueOf(bidsQuantity);
 
 //          bidsPriceHashMap.put(bidsIndex, String.format("%,d", iBidsPrice));
 //          bidsQuantityHashMap.put(bidsIndex, String.format("%,f", dBidsQuantity));
@@ -222,5 +226,53 @@ public class MainController {
     returnData.add(asksQuantityHashMap);
 
     return returnData;
+  }
+
+@GetMapping("excel")
+@ResponseBody
+  public void excelDownload() {
+    ArrayList<String> list = new ArrayList<>();
+
+    XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
+
+    Sheet sheet = xssfWorkbook.createSheet("API");
+
+    Row row = null;
+    Cell cell = null;
+
+    int rowIdx = 0;
+
+    row = sheet.createRow(rowIdx++);
+
+    for (int i = 0; i < 4; i++) {
+      cell = row.createCell(i);
+      cell.setCellValue("셀 타이틀");
+    }
+
+    Iterator<String> iterator = list.iterator();
+
+    while (iterator.hasNext()) {
+      String asdf = iterator.next();
+
+      row = sheet.createRow(rowIdx++);
+      int cellIdx = 0;
+
+      cell = row.createCell(cellIdx++);
+      cell.setCellValue("데이터");
+
+    }
+
+
+    String path = "C://";
+    String fileName = "test.xlsx";
+    File xlsFile = new File(path+fileName);
+    try {
+      FileOutputStream fileOutputStream = new FileOutputStream(xlsFile);
+      xssfWorkbook.write(fileOutputStream);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

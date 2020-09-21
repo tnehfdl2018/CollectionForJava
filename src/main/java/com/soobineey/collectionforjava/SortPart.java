@@ -1,5 +1,8 @@
 package com.soobineey.collectionforjava;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 public class SortPart implements Comparable<SortPart> {
   private String price = null;
   private String quantity = null;
@@ -33,5 +36,7 @@ public class SortPart implements Comparable<SortPart> {
     } else {
       return Double.valueOf(this.quantity).compareTo(Double.valueOf(current.quantity));
     }
+
+//    Collections.sort(list, Comparator.comparingInt(String::length).thenComparing(String::compareTo));
   }
 }
