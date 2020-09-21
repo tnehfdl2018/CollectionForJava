@@ -7,11 +7,14 @@
   <meta name="description" content=""/>
   <meta name="author" content=""/>
 <!--  <meta http-equiv="refresh" content="10; url=/" >-->
-  <title>ㅎㅇ</title>
+  <title>Order_book</title>
+  <style type="text/css">
+
+  </style>
+
 <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
 
   <script>
-
     (function () {
       sendController("BTC", "KRW", 0);
     }());
@@ -95,17 +98,15 @@
     function excel() {
       $.ajax({
         type: "get",
-        url: "excel", // 정렬기준, 순서를 보낸다.
+        url: "excel", // 엑셀 다운로드 메소드 호출
         success: function (data) {
           console.log(data);
-
         },
         error: function (data) {
-          console.log(data);
+            alert("파일 다운로드에 실패하였습니다.");
           return;
         }
       });
-
     }
   </script>
 </head>
@@ -127,10 +128,26 @@
             <table class="table table-bordered" id="dataTable" border="1">
               <thead>
               <tr>
-                <th><button onclick="dataSort('bids', 'price', 'DESC')">내림차순</button>매수 거래가<button onclick="dataSort('bids', 'price', 'ASC')">오름차순</button></th>
-                <th><button onclick="dataSort('bids', 'quantity', 'DESC')">내림차순</button>매수 수량<button onclick="dataSort('bids', 'quantity', 'ASC')">오름차순</button></th>
-                <th><button onclick="dataSort('asks', 'price', 'DESC')">내림차순</button>매도 거래가<button onclick="dataSort('asks', 'price', 'ASC')">오름차순</button></th>
-                <th><button onclick="dataSort('asks', 'quantity', 'DESC')">내림차순</button>매도 수량<button onclick="dataSort('asks', 'quantity', 'ASC')">오름차순</button></th>
+                <th style="background-color: #ff719b">
+                  <button onclick="dataSort('bids', 'price', 'DESC')" style="background-color: #2675ff;">내림차순</button>
+                  매수 거래가
+                  <button onclick="dataSort('bids', 'price', 'ASC')" style="background-color: #ff3d72">오름차순</button>
+                </th>
+                <th style="background-color: #ff719b">
+                  <button onclick="dataSort('bids', 'quantity', 'DESC')" style="background-color: #2675ff;">내림차순</button>
+                  매수 수량
+                  <button onclick="dataSort('bids', 'quantity', 'ASC')" style="background-color: #ff3d72">오름차순</button>
+                </th>
+                <th style="background-color: #76cbff">
+                  <button onclick="dataSort('asks', 'price', 'DESC')" style="background-color: #2675ff;">내림차순</button>
+                  매도 거래가
+                  <button onclick="dataSort('asks', 'price', 'ASC')" style="background-color: #ff3d72">오름차순</button>
+                </th>
+                <th style="background-color: #76cbff">
+                  <button onclick="dataSort('asks', 'quantity', 'DESC')" style="background-color: #2675ff;">내림차순</button>
+                  매도 수량
+                  <button onclick="dataSort('asks', 'quantity', 'ASC')" style="background-color: #ff3d72">오름차순</button>
+                </th>
               </tr>
               </thead>
               <tbody id="tableBody">
