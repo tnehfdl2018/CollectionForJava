@@ -1,14 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <meta name="description" content=""/>
+  <meta name="author" content=""/>
+<!--  <meta http-equiv="refresh" content="10; url=/" >-->
   <title>ㅎㅇ</title>
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+  <script>
+
+    (function () {
+      sendController("BTC", "KRW", 0);
+    }());
+
+    // 원하는 코인 검색
+    function coinSearch() {
+      let orderCoin = document.getElementById("inputCoin").value;
+      let payMent = document.getElementById("payMent").value;
+      let coinTitle = document.getElementById("coinTitle");
+      coinTitle.innerText = orderCoin;
+      sendController(orderCoin, payMent, 1);
+    }
+
+    // json형태의 데이터를 파라미터로 받는다.
+    function sendController(coin, pay, frag) {
+
+      // ajax를 이용하여 전달
+      $.ajax({
+        type: "get",
+        url: "searchCoin",
+        data: {"inputCoin": coin, "payMent" : pay},
+        success: function (data) {
+          let my_tbody = document.getElementById("tableBody");
+          console.log(data);
+          // frag를 확인하여 추가를 할 것인지, 변경을 할것인지 결정한다.
+          if (frag == 0) {
+            for (let i = 0 ; i < 30 ; ++i) {
+              let row = my_tbody.insertRow(my_tbody.rows.length);
+              let cell1 = row.insertCell(0);
+              let cell2 = row.insertCell(1);
+              let cell3 = row.insertCell(2);
+              let cell4 = row.insertCell(3);
+
+              for (let j = 0; j < 30; ++j) {
+                cell1.innerHTML = data[0][i];
+                cell2.innerHTML = data[1][i];
+                cell3.innerHTML = data[2][i];
+                cell4.innerHTML = data[3][i];
+              }
+            }
+          } else if (frag == 1) {
+            for (let i = 0; i < 30; ++i) {
+              for (let j = 0; j < 4; ++j) {
+                my_tbody.rows[i].cells[j].innerHTML = data[j][i];
+              }
+            }
+          }
+        },
+        error: function (data) {
+          alert("데이터 출력 중 에러가 발생하였습니다.");
+          console.log(data);
+          return;
+        }
+      });
+    }
+
+    // 정렬
+    function dataSort(targetData, target, sequence) { // 파라미터 (정렬 기준, 순서)
+      // 데이터를 넣을 위치의 정보를 얻는다.
+      let my_tbody = document.getElementById('tableBody');
+
+      $.ajax({
+        type: "get",
+        url: "dataSort", // 정렬기준, 순서를 보낸다.
+        data: {"targetData": targetData, "target": target, "sequence": sequence},
+        success: function (data) {
+          // 성공시
+          for (let i = 0; i < 30; ++i) {
+            for (let j = 0; j < 4; ++j) {
+              my_tbody.rows[i].cells[j].innerHTML = data[j][i];
+            }
+          }
+        },
+        error: function (data) {
+          alert("정렬에 실패하였습니다.");
+          return;
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 
-디스 이즈 인덱스
-
-
-
+<div id="layoutSidenav">
+  <main>
+    <div class="container-fluid ml-10">
+      <h1 class="mt-4" id="coinTitle">Order_book</h1>
+      <div class="card mb-4">
+        <div>
+          <input type="text" id="inputCoin" placeholder="주문통화를 입력하세요." style="width: 15%">
+          <input type="text" id="payMent" placeholder="결제통화를 입력하세요." value="KRW" style="width: 15%">
+          <input type="submit" value="검색" style="width: 5%" onclick="coinSearch()">
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" border="1">
+              <thead>
+              <tr>
+                <th><button onclick="dataSort('bids', 'price', 'DESC')">내림차순</button>매수 거래가<button onclick="dataSort('bids', 'price', 'ASC')">오름차순</button></th>
+                <th><button onclick="dataSort('bids', 'quantity', 'DESC')">내림차순</button>매수 수량<button onclick="dataSort('bids', 'quantity', 'ASC')">오름차순</button></th>
+                <th><button onclick="dataSort('asks', 'price', 'DESC')">내림차순</button>매도 거래가<button onclick="dataSort('asks', 'price', 'ASC')">오름차순</button></th>
+                <th><button onclick="dataSort('asks', 'quantity', 'DESC')">내림차순</button>매도 수량<button onclick="dataSort('asks', 'quantity', 'ASC')">오름차순</button></th>
+              </tr>
+              </thead>
+              <tbody id="tableBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 </body>
 </html>
