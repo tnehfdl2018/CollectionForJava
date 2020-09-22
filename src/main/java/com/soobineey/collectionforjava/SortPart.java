@@ -1,7 +1,5 @@
 package com.soobineey.collectionforjava;
 
-import static java.lang.Double.isFinite;
-
 public class SortPart implements Comparable<SortPart> {
   private String price = null;
   private String quantity = null;
@@ -13,6 +11,8 @@ public class SortPart implements Comparable<SortPart> {
     this.price = price;
     this.quantity = quantity;
   }
+
+  public SortPart() {}
 
   public String getPrice() {
     return price;
@@ -27,73 +27,95 @@ public class SortPart implements Comparable<SortPart> {
   public int compareTo(SortPart current) {
     // if문으로 sorting의 기준을 판단하고 sort를 진행한다.
     if (target.equals("asksPrice")) {
-      return newCompareTo(this.price, current.price);
-//      return Double.valueOf(this.price).compareTo(Double.valueOf(current.price));
+      return stringCompareTo(this.price, current.price);
     } else if (target.equals("asksQuantity")) {
-      return newCompareTo(this.quantity, current.quantity);
-//      return Double.valueOf(this.quantity).compareTo(Double.valueOf(current.quantity));
+      return stringCompareTo(this.quantity, current.quantity);
     } else if (target.equals("bidsPrice")) {
-      return newCompareTo(this.price, current.price);
-//      return Double.valueOf(this.price).compareTo(Double.valueOf(current.price));
+      return stringCompareTo(this.price, current.price);
     } else {
-      return newCompareTo(this.quantity, current.quantity);
-//      return Double.valueOf(this.quantity).compareTo(Double.valueOf(current.quantity));
+      return stringCompareTo(this.quantity, current.quantity);
     }
 
-//    Collections.sort(list, Comparator.comparingInt(String::length).thenComparing(String::compareTo));
   }
 
+  public int stringCompareTo(String firstNum, String secondNum) {
+    int pointIndex = 0;
+    String firstWholeNumber = null;
+    String secondWholeNumber = null;
+    String firstRationalNumber = null;
+    String secondRationalNumber = null;
 
-  private int newCompareTo(String firstNum, String secondNum) {
-    // 숫자의 길이를 확인 (둘다 0이면 같고 둘중의 하나가 0이면 0인수가 작은수)
-    if (firstNum.length() == 0) {
-      if (secondNum.length() == 0) {
-        return 0;
-      }
-      return -1;
-    } else if (secondNum.length() == 0) {
-      return 1;
-    }
+    // .을 찾아 구분하여 자연수 부분과 소수점 아래 부분을 나눈다.
+    if (firstNum.indexOf('.') != -1) {
+      // 첫번째 숫자의 . 위치 확인 및 나누기
+      pointIndex = firstNum.indexOf('.');
+      firstWholeNumber = firstNum.substring(0, pointIndex);
+      firstRationalNumber = firstNum.substring(pointIndex);
 
-    // 숫자가 유한한 소수 또는 숫자인지 확인한다.
-    if (isFinite(Double.valueOf(firstNum))) {
-      Double val1 = Double.parseDouble(firstNum);
-      if (isFinite(Double.valueOf(secondNum))) {
-        Double val2 = Double.parseDouble(secondNum);
-        return Double.compare(val1, val2);
+      if (secondNum.indexOf('.') != -1) {
+        // 두번째 숫자의 . 위치 확인 및 나누기
+        pointIndex = firstNum.indexOf('.');
+        secondWholeNumber = secondNum.substring(0, pointIndex);
+        secondRationalNumber = secondNum.substring(pointIndex);
       } else {
-        return firstNum.compareTo(secondNum);
+        // 소수가 아니라면 정수 전체 그대로 저장
+        secondWholeNumber = secondNum;
       }
     } else {
-      // 두개의 숫자 중 짧은 숫자의 길이를 저장
-      int minVal = Math.min(firstNum.length(), secondNum.length());
-      int sameCount = 0;
+      // 첫번째 숫자가 소수가 아니라면 정수 전체 그대로 저장
+      firstWholeNumber = firstNum;
+      if (secondNum.indexOf('.') != -1) {
+        // 두번째 숫자의 . 위치 확인 및 나누기
+        pointIndex = secondNum.indexOf('.');
+        secondWholeNumber = secondNum.substring(0, pointIndex);
+        secondRationalNumber = secondNum.substring(pointIndex);
+      } else {
+        // 소수가 아니라면 정수 전체 그대로 저장
+        secondWholeNumber = secondNum;
+      }
+    }
+    // 길이가 같은지 비교
+    if (firstWholeNumber.length() == secondWholeNumber.length()) {
+      char firstNumChar;
+      char secondNumChar;
 
-      // 포문을 돌며 같은 자리 다른 숫자가 나올때까지 확인한다.
-      for (int i = 0; i < minVal; i++) {
-        char leftVal = firstNum.charAt(i), rightVal = secondNum.charAt(i);
-        if (leftVal == rightVal) {
-          sameCount++;
-        } else {
-          break;
+      // 길이가 같다면 각각의 인덱스를 1대1로 비교
+      for (int dIdx = 0; dIdx < firstWholeNumber.length(); dIdx++) {
+        firstNumChar = firstWholeNumber.charAt(dIdx);
+        secondNumChar = secondWholeNumber.charAt(dIdx);
+        // 각각의 인덱스 비교중 값이 다르다면 큰값에 대해 리턴한다.
+        if (firstNumChar != secondNumChar) {
+          return firstNumChar > secondNumChar ? 1 : -1;
         }
       }
-      // 같은 자리의 같은 숫자가 없다면 두개의 숫자를 compareTo를 이용하여 비교한다.
-      if (sameCount == 0) {
-        return firstNum.compareTo(secondNum);
-      } else {
-        // 같은 자리의 다른 숫자가 있다면 같은 숫자 자리까지 잘라서 저장
-        String newStr1 = firstNum.substring(sameCount), newStr2 = secondNum.substring(sameCount);
-        if (!newStr1.isEmpty() && !newStr2.isEmpty()) {
-          if (Double.valueOf(newStr1).isInfinite() && Double.valueOf(newStr2).isInfinite()) {
-            // 자른 숫자를 비교하여 크기를 비교, 결과를 리턴한다.
-            return Double.compare(Double.valueOf(newStr1), Double.valueOf(newStr2));
+      // 소숫점 아래 숫자의 갯수가 같다면 1대1 매칭 비교
+      int rationalNumLength = 0;
+      if (firstRationalNumber != null && secondRationalNumber != null) {
+        rationalNumLength = firstRationalNumber.length() > secondRationalNumber.length() ? firstRationalNumber.length() : secondRationalNumber.length();
+      }
+       // 길이가 긴 문자열의 길이만큼 for문을 돌면서 비교
+        for (int dIdx = 0; dIdx < rationalNumLength; dIdx++) {
+          if (firstRationalNumber.length() > dIdx) {
+            // 만약 인덱스 값이 문자열의 길이보다 길어진다면 비교할 charactor에는 0 대입
+            firstNumChar = firstRationalNumber.charAt(dIdx);
           } else {
-            return firstNum.compareTo(secondNum);
+            firstNumChar = '0';
+          }
+          if (secondRationalNumber.length() > dIdx) {
+            secondNumChar = secondRationalNumber.charAt(dIdx);
+          } else {
+            secondNumChar = '0';
+          }
+          // 각각의 인덱스 비교중 값이 다르다면 큰값에 대해 리턴한다.
+          if (firstNumChar != secondNumChar) {
+            return firstNumChar > secondNumChar ? 1 : -1;
           }
         }
-        return 0;
-      }
+      // for문을 빠져나가지 못했다면 값이 같음으로 0을 리턴
+      return 0;
+    } else {
+      // 길이가 같지 않을 때 처리 로직
+      return firstWholeNumber.length() > secondWholeNumber.length() ? 1 : -1;
     }
   }
 }

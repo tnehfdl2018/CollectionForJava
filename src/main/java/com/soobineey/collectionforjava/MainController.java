@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,12 +27,6 @@ public class MainController {
   private HashMap<Integer, String> bidsPriceHashMap = new HashMap<>();
   private HashMap<Integer, String> bidsQuantityHashMap = new HashMap<>();
 
-  private String lastReceivedData = null;
-
-  private Boolean asksPriceSortingSequence = true;
-  private Boolean asksQuantitySortingSequence = true;
-  private Boolean bidsPriceSortingSequence = true;
-  private Boolean bidsQuantitySortingSequence = true;
 
   private ArrayList<HashMap<Integer, String>> returnData = new ArrayList<>();
 
@@ -48,6 +43,8 @@ public class MainController {
 
   private final String PRICE = "price";
   private final String QUANTITY = "quantity";
+
+  private String sortSequence = null;
 
 
   @GetMapping("/")
@@ -80,7 +77,6 @@ public class MainController {
       // 받아온 데이터가 null이 아니라면 진행
       if (line != null) {
         // 정렬을 위해 데이터 저장
-        lastReceivedData = line;
         System.out.println(line);
 
         // String 데이터 jsonParsing을 위해 파서 생성
@@ -164,6 +160,8 @@ public class MainController {
     String price = null;
     String quantity = null;
     String sortKinds = null;
+
+    this.sortSequence = sortSequence;
 
     /**
      * 구분 해야 하는 것
@@ -276,7 +274,7 @@ public class MainController {
     for (int i = 0; i < title.size(); i++) {
       cell = row.createCell(i);
       cell.setCellValue(title.get(i));
-      sheet.setColumnWidth(i, 20*256+200);
+      sheet.setColumnWidth(i, 20*256+200); // 셀사이즈 지정
     }
 
     // 실제 데이터를 넣는 for문
@@ -299,7 +297,6 @@ public class MainController {
 
       cell = row.createCell(cellIdx++);
       cell.setCellValue(list.get(3).get(i));
-
     }
 
     // 엑셀파일을 저장할 위치 지정
@@ -320,5 +317,45 @@ public class MainController {
       System.out.println("파일을 저장하던중 오류가 발생했습니다.");
       return;
     }
+  }
+
+  @GetMapping("searchData")
+  @ResponseBody
+  public String searchData(@RequestParam("search") String data) {
+    System.out.println(data);
+
+    SortPart sortPart = new SortPart();
+    // 매수 가격
+    int beforeIndex = 0;
+    int lastIndex = asksPriceHashMap.size() - 1;
+    int index = 0;
+
+    String findData = null;
+
+    while (lastIndex - beforeIndex >= 0) {
+      index = (beforeIndex + lastIndex) / 2;
+
+      findData = asksPriceHashMap.get(index);
+      int compareReturn = sortPart.stringCompareTo(data, findData);
+
+      if (sortSequence.equals("ASC")) { // 오름차순일 경우
+        if (compareReturn == 0) { // 찾는 데이터 검색 완료
+          break;
+        } else if (compareReturn == 1) {
+          beforeIndex = index + 1;
+        }else if (compareReturn == -1) {
+          lastIndex = index - 1;
+        }
+      } else { // 내림차순일 경우
+        if (compareReturn == 0) { // 찾는 데이터 검색 완료
+          break;
+        } else if (compareReturn == 1) {
+          lastIndex = index - 1;
+        }else if (compareReturn == -1) {
+          beforeIndex = index + 1;
+        }
+      }
+    }
+    return findData;
   }
 }
