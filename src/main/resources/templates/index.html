@@ -15,6 +15,7 @@
 <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
 
   <script>
+    let my_tbody;
     (function () {
       sendController("BTC", "KRW", 0);
     }());
@@ -37,7 +38,7 @@
         url: "searchCoin",
         data: {"inputCoin": coin, "payMent" : pay},
         success: function (data) {
-          let my_tbody = document.getElementById("tableBody");
+          my_tbody = document.getElementById("tableBody");
           console.log(data);
           // frag를 확인하여 추가를 할 것인지, 변경을 할것인지 결정한다.
           if (frag == 0) {
@@ -80,7 +81,7 @@
     // 정렬
     function dataSort(targetData, target, sequence) { // 파라미터 (정렬 기준, 순서)
       // 데이터를 넣을 위치의 정보를 얻는다.
-      let my_tbody = document.getElementById('tableBody');
+      my_tbody = document.getElementById('tableBody');
 
       $.ajax({
         type: "get",
@@ -125,6 +126,17 @@
         success: function (data) {
           console.log("찾은 데이터 값");
           console.log(data);
+
+          for (let i = 0; i < 30; ++i) {
+            for (let j = 0; j < 4; ++j) {
+              if (my_tbody.rows[i].cells[j].matches(data)) {
+                console.log("오");
+              }
+
+            }
+          }
+
+
         },
         error: function (data) {
           alert("검색에 실패 하였습니다..");
