@@ -41,6 +41,13 @@ public class MainController {
   private final String BIDS = "bids";
   private final String ASKS = "asks";
 
+  private final String BIDS_PRICE = "bidsPrice";
+  private final String BIDS_QUANTITY = "bidsQuantity";
+  private final String ASKS_PRICE = "asksPrice";
+  private final String ASKS_QUANTITY = "asksQuantity";
+
+
+
   private final String PRICE = "price";
   private final String QUANTITY = "quantity";
 
@@ -161,6 +168,7 @@ public class MainController {
     String quantity = null;
     String sortKinds = null;
 
+    // 검색시 오름차순과 내림차순 구분을 위해 저장
     this.sortSequence = sortSequence;
 
     /**
@@ -172,21 +180,21 @@ public class MainController {
 
       if (standardData.equals(BIDS)) {
         if (standardKinds.equals(PRICE)) {
-          sortKinds = "bidsPrice";
+          sortKinds = BIDS_PRICE;
           price = bidsPriceHashMap.get(sortDataIndex);
           quantity = bidsQuantityHashMap.get(sortDataIndex);
         } else {
-          sortKinds = "bidsQuantity";
+          sortKinds = BIDS_QUANTITY;
           price = bidsPriceHashMap.get(sortDataIndex);
           quantity = bidsQuantityHashMap.get(sortDataIndex);
         }
       } else if (standardData.equals(ASKS)) {
         if (standardKinds.equals(PRICE)) {
-          sortKinds = "asksPrice";
+          sortKinds = ASKS_PRICE;
           price = asksPriceHashMap.get(sortDataIndex);
           quantity = asksQuantityHashMap.get(sortDataIndex);
         } else {
-          sortKinds = "asksQuantity";
+          sortKinds = ASKS_QUANTITY;
           price = asksPriceHashMap.get(sortDataIndex);
           quantity = asksQuantityHashMap.get(sortDataIndex);
         }
@@ -321,41 +329,73 @@ public class MainController {
 
   @GetMapping("searchData")
   @ResponseBody
-  public String searchData(@RequestParam("search") String data) {
+  public String searchData(@RequestParam("searchKinds") String findKinds, @RequestParam("search") String data) {
     System.out.println(data);
+
+    if (findKinds.equals(ASKS_PRICE)) {
+      return findNumber(asksPriceHashMap, data, "price");
+
+    } else if (findKinds.equals(ASKS_QUANTITY)) {
+      return findNumber(asksQuantityHashMap, data, "quantity");
+
+    } else if (findKinds.equals(BIDS_PRICE)) {
+      return findNumber(bidsPriceHashMap, data, "price");
+
+    } else {
+      return findNumber(bidsQuantityHashMap, data, "quantity");
+    }
+  }
+
+  public String findNumber(HashMap<Integer, String> data, String findNumber, String separator) {
 
     SortPart sortPart = new SortPart();
     // 매수 가격
     int beforeIndex = 0;
-    int lastIndex = asksPriceHashMap.size() - 1;
+    int lastIndex = data.size() - 1;
     int index = 0;
 
     String findData = null;
 
     while (lastIndex - beforeIndex >= 0) {
+
+      if (findData != null && separator.equals("quantity") && lastIndex - beforeIndex > 0) {
+        return findData;
+      }
+      // 데이터 인덱스값을 중간으로 지정한다.
       index = (beforeIndex + lastIndex) / 2;
 
-      findData = asksPriceHashMap.get(index);
-      int compareReturn = sortPart.stringCompareTo(data, findData);
+      // 인덱스 값에 들어있는 value를 꺼낸다.
+      findData = data.get(index);
+      System.out.println("findData");
+      System.out.println(findData);
+      // 크기를 비교한다.
+      int compareReturn = sortPart.stringCompareTo(findNumber, findData);
+      if (compareReturn == 0)
+        break;
 
-      if (sortSequence.equals("ASC")) { // 오름차순일 경우
-        if (compareReturn == 0) { // 찾는 데이터 검색 완료
-          break;
-        } else if (compareReturn == 1) {
+      // 정렬순서가 오름차순일 경우
+      if (sortSequence.equals(UPPERCASE_ASC)) {
+        if (compareReturn == 1) {
           beforeIndex = index + 1;
-        }else if (compareReturn == -1) {
+        } else {
           lastIndex = index - 1;
         }
-      } else { // 내림차순일 경우
-        if (compareReturn == 0) { // 찾는 데이터 검색 완료
-          break;
-        } else if (compareReturn == 1) {
+        // 정렬순서가 내림차순일 경우
+      } else {
+        if (compareReturn == 1) {
           lastIndex = index - 1;
-        }else if (compareReturn == -1) {
+        } else {
           beforeIndex = index + 1;
         }
       }
     }
-    return findData;
+    System.out.println("최종값");
+    System.out.println(findData);
+    System.out.println(findNumber);
+    if (findData.equals(findNumber)) {
+      return findData;
+    } else {
+      return "err";
+    }
   }
 }

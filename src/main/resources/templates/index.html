@@ -55,17 +55,31 @@
                 let thirdData = data[2][i];
                 let fourthData = data[3][i];
 
+                let secondShowDataInteger = secondData.substr(0, secondData.indexOf('.'));
+                let secondShowDataPoint = secondData.substr(secondData.indexOf('.'));
+                secondShowDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                let thirdShowDataInteger = fourthData.substr(0, fourthData.indexOf('.'));
+                let thirdShowDataPoint = fourthData.substr(fourthData.indexOf('.'));
+                thirdShowDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
                 cell1.innerHTML = firstData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                cell2.innerHTML = secondData;
+                // cell2.innerHTML = secondData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                cell2.innerHTML = secondShowDataInteger + secondShowDataPoint;
                 cell3.innerHTML = thirdData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                cell4.innerHTML = fourthData;
+                // cell4.innerHTML = fourthData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                cell4.innerHTML = thirdShowDataInteger + thirdShowDataPoint;
               }
             }
           } else if (frag == 1) {
             for (let i = 0; i < 30; ++i) {
               for (let j = 0; j < 4; ++j) {
-                let showData = data[j][i]
-                my_tbody.rows[i].cells[j].innerHTML = showData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                let showData = data[j][i];
+                  let showDataInteger = showData.substr(0, showData.indexOf('.'));
+                  let showDataPoint = showData.substr(showData.indexOf('.'));
+                  showDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  my_tbody.rows[i].cells[j].innerHTML = showDataInteger + showDataPoint;
+                  // my_tbody.rows[i].cells[j].innerHTML = showData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
               }
             }
           }
@@ -91,7 +105,11 @@
           // 성공시
           for (let i = 0; i < 30; ++i) {
             for (let j = 0; j < 4; ++j) {
-              let showData = data[j][i]
+              let showData = data[j][i];
+              // let showDataInteger = showData.substr(0, showData.indexOf('.'));
+              // let showDataPoint = showData.substr(showData.indexOf('.'));
+              // showDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              // my_tbody.rows[i].cells[j].innerHTML = showDataInteger + showDataPoint;
               my_tbody.rows[i].cells[j].innerHTML = showData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
           }
@@ -119,27 +137,28 @@
 
     function onSearch() {
       let search = document.getElementById("search").value;
+      let selectOption = document.getElementById("searchKinds");
+      selectOption = selectOption.options[selectOption.selectedIndex].value;
+      console.log(selectOption);
       $.ajax({
         type: "get",
         url: "searchData", // 서치 메소드 호출
-        data: {"search" : search},
+        data: {"searchKinds" : selectOption, "search" : search},
         success: function (data) {
-          console.log("찾은 데이터 값");
-          console.log(data);
-
-          for (let i = 0; i < 30; ++i) {
-            for (let j = 0; j < 4; ++j) {
-              if (my_tbody.rows[i].cells[j].matches(data)) {
-                console.log("오");
-              }
-
+            if (data == "err") {
+                alert("없는 데이터 입니다.");
+                return;
+            } else {
+                for (let i = 0; i < 120; i++) {
+                    let str = document.getElementsByTagName('td')[val].childNodes[0].nodeValue;
+                    if (str == data) {
+                        console.log("오!!");
+                    }
+                }
             }
-          }
-
-
         },
         error: function (data) {
-          alert("검색에 실패 하였습니다..");
+          alert("검색에 실패 하였습니다.");
           return;
         }
       });
@@ -172,6 +191,14 @@
                 <td><input type="button" value="엑셀" style="width: 100%" onclick="excel()"></td>
               </tr>
               <tr>
+                <td>
+                  <select id="searchKinds">
+                    <option value="bidsPrice">매수 거래가</option>
+                    <option value="bidsQuantity">매수 수량</option>
+                    <option value="asksPrice">매도 거래가</option>
+                    <option value="asksQuantity">매도 수량</option>
+                  </select>
+                </td>
                 <td colspan="2"><input type="text" id="search" placeholder="검색할 데이터 입력" style="width: 98%"></td>
                 <td><input type="button" value="테이블 내 검색" style="width: 100%" onclick="onSearch()"></td>
               </tr>

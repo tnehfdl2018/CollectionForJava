@@ -35,7 +35,6 @@ public class SortPart implements Comparable<SortPart> {
     } else {
       return stringCompareTo(this.quantity, current.quantity);
     }
-
   }
 
   public int stringCompareTo(String firstNum, String secondNum) {
@@ -54,7 +53,7 @@ public class SortPart implements Comparable<SortPart> {
 
       if (secondNum.indexOf('.') != -1) {
         // 두번째 숫자의 . 위치 확인 및 나누기
-        pointIndex = firstNum.indexOf('.');
+        pointIndex = secondNum.indexOf('.');
         secondWholeNumber = secondNum.substring(0, pointIndex);
         secondRationalNumber = secondNum.substring(pointIndex);
       } else {
@@ -90,9 +89,14 @@ public class SortPart implements Comparable<SortPart> {
       }
       // 소숫점 아래 숫자의 갯수가 같다면 1대1 매칭 비교
       int rationalNumLength = 0;
-      if (firstRationalNumber != null && secondRationalNumber != null) {
-        rationalNumLength = firstRationalNumber.length() > secondRationalNumber.length() ? firstRationalNumber.length() : secondRationalNumber.length();
+      // 소수점이 없으면 없는 인자값은 무조건 작은 수 이기때문에 확인한다.
+      if (firstRationalNumber == null) {
+        return -1;
+      } else if (secondRationalNumber == null) {
+        return 1;
       }
+      rationalNumLength = firstRationalNumber.length() > secondRationalNumber.length() ? firstRationalNumber.length() : secondRationalNumber.length();
+
        // 길이가 긴 문자열의 길이만큼 for문을 돌면서 비교
         for (int dIdx = 0; dIdx < rationalNumLength; dIdx++) {
           if (firstRationalNumber.length() > dIdx) {
