@@ -16,6 +16,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +65,11 @@ public class MainController {
   public ArrayList<HashMap<Integer, String>> getBithumbAPI(@RequestParam("inputCoin") String orderCurrency, @RequestParam("payMent") String paymentCurrency) {
     returnData.clear();
 
+    HashMap<Integer, String> commaBidsPrice = new HashMap<>();
+    HashMap<Integer, String> commaBidsQuantity = new HashMap<>();
+    HashMap<Integer, String> commaAsksPrice = new HashMap<>();
+    HashMap<Integer, String> commaAsksQuantity = new HashMap<>();
+
     if (orderCurrency == null || paymentCurrency == null) {
       throw  new NullPointerException();
     }
@@ -100,6 +106,8 @@ public class MainController {
 
         JSONObject object;
 
+//        DecimalFormat format = new DecimalFormat("###,###");
+
         // 각각의 데이터를 ArrayList에 Price, Quantity순으로 담는다.
         for (int asksIndex = 0; asksIndex < asksJsonArray.size(); asksIndex++) {
           object = (JSONObject) asksJsonArray.get(asksIndex);
@@ -109,6 +117,9 @@ public class MainController {
           // 데이터를 다룰 해쉬맵에 저장
           asksPriceHashMap.put(asksIndex, asksPrice);
           asksQuantityHashMap.put(asksIndex, asksQuantity);
+//          commaAsksPrice.put(asksIndex, format.format(asksPrice));
+//          commaAsksQuantity.put(asksIndex, format.format(asksQuantity));
+
         }
 
         for (int bidsIndex = 0; bidsIndex < bidsJsonArray.size(); bidsIndex++) {
@@ -117,6 +128,8 @@ public class MainController {
           String bidsQuantity = (String) object.get(QUANTITY);
           bidsPriceHashMap.put(bidsIndex, bidsPrice);
           bidsQuantityHashMap.put(bidsIndex, bidsQuantity);
+//          commaBidsPrice.put(bidsIndex, format.format(bidsPrice));
+//          commaBidsQuantity.put(bidsIndex, format.format(bidsQuantity));
         }
 
         // 4가지의 데이터를 담은 HashMap을 arrayList에 순서대로 담는다.
@@ -124,6 +137,11 @@ public class MainController {
         returnData.add(bidsQuantityHashMap);
         returnData.add(asksPriceHashMap);
         returnData.add(asksQuantityHashMap);
+
+//        returnData.add(commaAsksPrice);
+//        returnData.add(commaAsksQuantity);
+//        returnData.add(commaBidsPrice);
+//        returnData.add(commaBidsQuantity);
 
       } else {
         throw  new NullPointerException();
@@ -390,6 +408,13 @@ public class MainController {
     if (findReturnData.equals(requestFindData)) {
       return findReturnData;
     } else {
+      // 선형 검색
+      for (int searchIndex = 0; searchIndex < hashData.size(); searchIndex++) {
+        if (requestFindData.equals(hashData.get(searchIndex))) {
+          findReturnData = hashData.get(searchIndex);
+          return findReturnData;
+        }
+      }
       return "err";
     }
   }

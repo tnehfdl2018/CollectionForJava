@@ -9,15 +9,27 @@
 <!--  <meta http-equiv="refresh" content="10; url=/" >-->
   <title>Order_book</title>
   <style type="text/css">
-      /*.table-users {*/
-      /*    border: 1px solid #327a81;*/
-      /*    border-radius: 10px;*/
-      /*    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);*/
-      /*    max-width: calc(100% - 2em);*/
-      /*    margin: 1em auto;*/
-      /*    overflow: hidden;*/
-      /*    width: 1000px;*/
-      /*}*/
+      .table-users, .coinTitle {
+          border: 1px solid #327a81;
+          border-radius: 10px;
+          box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+          max-width: calc(100% - 2em);
+          margin: 1em auto;
+          overflow: hidden;
+          width: 50%;
+      }
+      .coinTitle {
+          background-color: #00074f;
+          color: white;
+          text-align: center;
+      }
+      td {
+          /*height: 20px;*/
+          border-top: 1px solid #000000;
+          border-right: 1px solid #000000;
+          /*border-bottom: 1px solid #327a81;*/
+          /*border-right: 1px solid #327a81;*/
+      }
   </style>
 
 <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
@@ -25,7 +37,7 @@
   <script>
     let my_tbody;
     (function () {
-      sendController("BTC", "KRW", 0);
+      sendController("BTC", "KRW");
     }());
 
     // 원하는 코인 검색
@@ -33,13 +45,18 @@
       let orderCoin = document.getElementById("inputCoin").value;
       let payMent = document.getElementById("payMent").value;
       let coinTitle = document.getElementById("coinTitle");
-      coinTitle.innerText = orderCoin;
-      sendController(orderCoin, payMent, 1);
+      if (orderCoin != "" && payMent != "") {
+        coinTitle.innerText = orderCoin;
+        console.log(orderCoin);
+        sendController(orderCoin, payMent);
+      } else {
+        alert("주문통화 또는 지불통화를 입력하세요.");
+        return;
+      }
     }
 
     // json형태의 데이터를 파라미터로 받는다.
-    function sendController(coin, pay, frag) {
-
+    function sendController(coin, pay) {
       // ajax를 이용하여 전달
       $.ajax({
         type: "get",
@@ -57,9 +74,7 @@
             let fourthData = data[3][i];
 
             a += '<tr>';
-            a += '<h4 class="ui image header">';
             a += '<td id="firstData'+i+'">' + firstData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
-            a += '</h4>';
             a += '<td id="secondData'+i+'">' + secondData + '</td>';
             // a += '<td id="secondData">' + secondData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
             a += '<td id="thirdData'+i+'">' + thirdData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
@@ -106,7 +121,6 @@
             a += '<td id="fourthData'+i+'">' + fourthData + '</td>';
             // a += '<td id="fourthData">' + fourthData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
             a += '</tr>';
-
           }
           $("#tableBody").append(a);
         },
@@ -122,7 +136,7 @@
         type: "get",
         url: "excel", // 엑셀 다운로드 메소드 호출
         success: function (data) {
-          console.log(data);
+          alert("파일 다운로드에 성공하였습니다.");
         },
         error: function (data) {
             alert("파일 다운로드에 실패하였습니다.");
@@ -142,6 +156,8 @@
         url: "searchData", // 서치 메소드 호출
         data: {"searchKinds" : selectOption, "search" : search},
         success: function (data) {
+          // let tableControl = document.getElementById("dataTable").innerText;
+          // tableControl.style.color = "#000000";
           if (data == "err") {
             console.log(data);
             alert("없는 데이터 입니다.");
@@ -154,25 +170,26 @@
                 let str = document.getElementById("firstData"+i+"").innerText;
                 if (str.replace(/,/g,"") == data) {
                   let dataId = document.getElementById("firstData"+i+"");
-                  dataId.style.color = "#f00";
+                  // dataId.style.backgroundColor = "#ff0000";
+                  dataId.style.color = "#ff0000";
                 }
               } else if (selectOption == "bidsQuantity") {
                 let str = document.getElementById("secondData"+i+"").innerText;
                 if (str.replace(/,/g,"") == data) {
                   let dataId = document.getElementById("secondData"+i+"");
-                  dataId.style.color = "#f00";
+                  dataId.style.color = "#ff0000";
                 }
               } else if (selectOption == "asksPrice") {
                 let str = document.getElementById("thirdData"+i+"").innerText;
                 if (str.replace(/,/g,"") == data) {
                   let dataId = document.getElementById("thirdData"+i+"");
-                  dataId.style.color = "#f00";
+                  dataId.style.color = "#ff0000";
                 }
               } else {
                 let str = document.getElementById("fourthData"+i+"").innerText;
                 if (str.replace(/,/g,"") == data) {
                   let dataId = document.getElementById("fourthData"+i+"");
-                  dataId.style.color = "#f00";
+                  dataId.style.color = "#ff0000";
                 }
               }
             }
@@ -191,18 +208,18 @@
 <div id="layoutSidenav">
   <main>
     <div class="container-fluid ml-10">
-      <h1 class="mt-4" id="coinTitle">Order_book</h1>
+      <h1 class="mt-4 coinTitle" id="coinTitle">Order_book</h1>
       <div class="card mb-4">
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" border="1">
-<!--            <table class="table-users" id="dataTable">-->
+<!--            <table class="table table-bordered" id="dataTable" border="1">-->
+            <table class="table-users" id="dataTable">
               <thead>
               <tr>
                 <td><input type="text" id="inputCoin" placeholder="주문통화를 입력하세요." style="width: 97%;"></td>
                 <td><input type="text" id="payMent" placeholder="결제통화를 입력하세요." value="KRW" style="width: 97%;"></td>
-                <td><input type="button" value="검색" style="width: 100%" onclick="coinSearch()"></td>
-                <td><input type="button" value="엑셀" style="width: 100%" onclick="excel()"></td>
+                <td><input type="button" value="새 통화 검색" style="width: 100%; background-color: white" onclick="coinSearch()"></td>
+                <td><input type="button" value="엑셀 다운로드" style="width: 100%; background-color: #1db60a; color: white" onclick="excel()"></td>
               </tr>
               <tr>
                 <td>
@@ -214,7 +231,7 @@
                   </select>
                 </td>
                 <td colspan="2"><input type="text" id="search" placeholder="검색할 데이터 입력" style="width: 98%"></td>
-                <td><input type="button" value="테이블 내 검색" style="width: 100%" onclick="onSearch()"></td>
+                <td><input type="button" value="테이블 내 검색" style="width: 100%; background-color: white" onclick="onSearch()"></td>
               </tr>
               <tr>
                 <th style="background-color: #ff719b">
