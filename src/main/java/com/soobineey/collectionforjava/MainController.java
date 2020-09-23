@@ -312,7 +312,7 @@ public class MainController {
 
     // 엑셀파일을 저장할 위치 지정
     String path = "C://test/";
-    String fileName = "test.xlsx";
+    String fileName = "order_book.xlsx";
     // File 객체를 생성하고 저장할 위치를 파라미터값으로 넘긴다.
     File xlsFile = new File(path+fileName);
     try {

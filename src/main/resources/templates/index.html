@@ -17,6 +17,7 @@
           margin: 1em auto;
           overflow: hidden;
           width: 50%;
+          /*text-align: center;*/
       }
       .coinTitle {
           background-color: #00074f;
@@ -27,6 +28,7 @@
           /*height: 20px;*/
           border-top: 1px solid #000000;
           border-right: 1px solid #000000;
+          /*background: linear-gradient(to right, #2675ff, #76cbff);*/
           /*border-bottom: 1px solid #327a81;*/
           /*border-right: 1px solid #327a81;*/
       }
@@ -155,6 +157,7 @@
       console.log(selectOption);
 
       if (dataId != null) {
+        // 두번째 검색이라면 기존 검색으로 색이 바뀐 String의 색을 원래대로 되돌린다.
         dataId.style.color = "#000000";
       }
       $.ajax({
@@ -162,21 +165,17 @@
         url: "searchData", // 서치 메소드 호출
         data: {"searchKinds" : selectOption, "search" : search},
         success: function (data) {
-          // let tableControl = document.getElementById("dataTable").innerText;
-          // tableControl.style.color = "#000000";
           if (data == "err") {
             console.log(data);
             alert("없는 데이터 입니다.");
             return;
           } else {
-            // console.log(data);
-            // alert("검색 데이터는 " + data + "입니다.");
+            // 데이터를 정상적으로 가져오면 실행
             for (let i = 0; i < 30; i++) {
               if (selectOption == "bidsPrice") {
                 let str = document.getElementById("firstData"+i+"").innerText;
                 if (str.replace(/,/g,"") == data) {
                   dataId = document.getElementById("firstData"+i+"");
-                  // dataId.style.backgroundColor = "#ff0000";
                   dataId.style.color = "#ff0000";
                 }
               } else if (selectOption == "bidsQuantity") {
