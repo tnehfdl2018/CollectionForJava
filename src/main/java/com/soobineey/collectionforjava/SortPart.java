@@ -90,7 +90,9 @@ public class SortPart implements Comparable<SortPart> {
       // 소숫점 아래 숫자의 갯수가 같다면 1대1 매칭 비교
       int rationalNumLength = 0;
       // 소수점이 없으면 없는 인자값은 무조건 작은 수 이기때문에 확인한다.
-      if (firstRationalNumber == null) {
+      if (firstRationalNumber == null && secondRationalNumber == null) {
+        return 0;
+      } else if (firstRationalNumber == null) {
         return -1;
       } else if (secondRationalNumber == null) {
         return 1;

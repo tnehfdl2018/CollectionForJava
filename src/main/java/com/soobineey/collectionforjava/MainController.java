@@ -76,7 +76,7 @@ public class MainController {
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       // 요청 방식은 GET
       connection.setRequestMethod("GET");
-      // 데이터를 받아아ㅗ기 위해 inputStream 생성 및 charSet 설정
+      // 데이터를 받아오기 위해 inputStream 생성 및 charSet 설정
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
       // 받아온 데이터를 String에 담기
       String line = bufferedReader.readLine();
@@ -106,13 +106,7 @@ public class MainController {
           // 데이터를 하나 하나 꺼내 String에 담는다.
           String asksPrice = (String) object.get(PRICE);
           String asksQuantity = (String) object.get(QUANTITY);
-          // String에 담았던 숫자를 int, Double로 변환
-//          int iAsksPrice = Integer.parseInt(asksPrice);
-//          Double dAsksQuantity = Double.valueOf(asksQuantity);
-
-          // 천단위마다 ,(콤마) 추가
-//          asksPriceHashMap.put(asksIndex, String.format("%,d", iAsksPrice));
-//          asksQuantityHashMap.put(asksIndex, String.format("%,f", dAsksQuantity));
+          // 데이터를 다룰 해쉬맵에 저장
           asksPriceHashMap.put(asksIndex, asksPrice);
           asksQuantityHashMap.put(asksIndex, asksQuantity);
         }
@@ -121,15 +115,11 @@ public class MainController {
           object = (JSONObject) bidsJsonArray.get(bidsIndex);
           String bidsPrice = (String) object.get(PRICE);
           String bidsQuantity = (String) object.get(QUANTITY);
-//          int iBidsPrice = Integer.parseInt(bidsPrice);
-//          Double dBidsQuantity = Double.valueOf(bidsQuantity);
-
-//          bidsPriceHashMap.put(bidsIndex, String.format("%,d", iBidsPrice));
-//          bidsQuantityHashMap.put(bidsIndex, String.format("%,f", dBidsQuantity));
           bidsPriceHashMap.put(bidsIndex, bidsPrice);
           bidsQuantityHashMap.put(bidsIndex, bidsQuantity);
         }
 
+        // 4가지의 데이터를 담은 HashMap을 arrayList에 순서대로 담는다.
         returnData.add(bidsPriceHashMap);
         returnData.add(bidsQuantityHashMap);
         returnData.add(asksPriceHashMap);
@@ -332,68 +322,73 @@ public class MainController {
   public String searchData(@RequestParam("searchKinds") String findKinds, @RequestParam("search") String data) {
     System.out.println(data);
 
+    // 찾으려는 데이터가 어떤 컬럼인지 구분하고 데이터와 함께 검색메소드를 호출한다.
     if (findKinds.equals(ASKS_PRICE)) {
-      return findNumber(asksPriceHashMap, data, "price");
+      return findNumber(asksPriceHashMap, data);
 
     } else if (findKinds.equals(ASKS_QUANTITY)) {
-      return findNumber(asksQuantityHashMap, data, "quantity");
+      return findNumber(asksQuantityHashMap, data);
 
     } else if (findKinds.equals(BIDS_PRICE)) {
-      return findNumber(bidsPriceHashMap, data, "price");
+      return findNumber(bidsPriceHashMap, data);
 
     } else {
-      return findNumber(bidsQuantityHashMap, data, "quantity");
+      return findNumber(bidsQuantityHashMap, data);
     }
   }
 
-  public String findNumber(HashMap<Integer, String> data, String findNumber, String separator) {
+  /**
+   * hashData - 검색할 데이터가 들어있는 HashMap
+   * requestFindData - 조회를 요청한 데이터
+   * */
+  public String findNumber(HashMap<Integer, String> hashData, String requestFindData) {
 
     SortPart sortPart = new SortPart();
-    // 매수 가격
+    // binary sorting을 위한 인덱스 포인트 3개
     int beforeIndex = 0;
-    int lastIndex = data.size() - 1;
-    int index = 0;
+    int lastIndex = hashData.size() - 1;
+    int realIndex = 0;
 
-    String findData = null;
+    // 최종 리턴 데이터
+    String findReturnData = null;
 
+    // lastIndex - beforeIndex >= 0가 false이면 더이상 검색할 인덱스가 없다.
     while (lastIndex - beforeIndex >= 0) {
 
-      if (findData != null && separator.equals("quantity") && lastIndex - beforeIndex > 0) {
-        return findData;
-      }
       // 데이터 인덱스값을 중간으로 지정한다.
-      index = (beforeIndex + lastIndex) / 2;
+      realIndex = (beforeIndex + lastIndex) / 2;
 
       // 인덱스 값에 들어있는 value를 꺼낸다.
-      findData = data.get(index);
-      System.out.println("findData");
-      System.out.println(findData);
+      findReturnData = hashData.get(realIndex);
       // 크기를 비교한다.
-      int compareReturn = sortPart.stringCompareTo(findNumber, findData);
+      int compareReturn = sortPart.stringCompareTo(requestFindData, findReturnData);
+      // 조회한 숫자와 인덱스 값이 같으면 0을 리턴
       if (compareReturn == 0)
         break;
 
       // 정렬순서가 오름차순일 경우
       if (sortSequence.equals(UPPERCASE_ASC)) {
+        // 조회한 값이 인덱스 값보다 클경우 1을 리턴
+        // 앞쪽의 인덱스 포인터를 현재 인덱스 + 1의 위치로 가져와 재 검색한다.
         if (compareReturn == 1) {
-          beforeIndex = index + 1;
+          beforeIndex = realIndex + 1;
+          // 조회한 값이 인덱스 값보다 작을경우 -1을 리턴
+          // 뒤쪽의 인덱스 포인터를 현재 인덱스 - 1의 위치로 가져와 재 검색한다.
         } else {
-          lastIndex = index - 1;
+          lastIndex = realIndex - 1;
         }
         // 정렬순서가 내림차순일 경우
       } else {
         if (compareReturn == 1) {
-          lastIndex = index - 1;
+          lastIndex = realIndex - 1;
         } else {
-          beforeIndex = index + 1;
+          beforeIndex = realIndex + 1;
         }
       }
     }
-    System.out.println("최종값");
-    System.out.println(findData);
-    System.out.println(findNumber);
-    if (findData.equals(findNumber)) {
-      return findData;
+    // 조회한 데이터가 없으면 err을 반환한다.
+    if (findReturnData.equals(requestFindData)) {
+      return findReturnData;
     } else {
       return "err";
     }

@@ -9,7 +9,15 @@
 <!--  <meta http-equiv="refresh" content="10; url=/" >-->
   <title>Order_book</title>
   <style type="text/css">
-
+      /*.table-users {*/
+      /*    border: 1px solid #327a81;*/
+      /*    border-radius: 10px;*/
+      /*    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);*/
+      /*    max-width: calc(100% - 2em);*/
+      /*    margin: 1em auto;*/
+      /*    overflow: hidden;*/
+      /*    width: 1000px;*/
+      /*}*/
   </style>
 
 <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
@@ -38,51 +46,29 @@
         url: "searchCoin",
         data: {"inputCoin": coin, "payMent" : pay},
         success: function (data) {
-          my_tbody = document.getElementById("tableBody");
           console.log(data);
-          // frag를 확인하여 추가를 할 것인지, 변경을 할것인지 결정한다.
-          if (frag == 0) {
-            for (let i = 0 ; i < 30 ; ++i) {
-              let row = my_tbody.insertRow(my_tbody.rows.length);
-              let cell1 = row.insertCell(0);
-              let cell2 = row.insertCell(1);
-              let cell3 = row.insertCell(2);
-              let cell4 = row.insertCell(3);
+          $("#tableBody").empty();
+          let a = "";
 
-              for (let j = 0; j < 30; ++j) {
-                let firstData = data[0][i];
-                let secondData = data[1][i];
-                let thirdData = data[2][i];
-                let fourthData = data[3][i];
+          for (let i = 0 ; i < 30 ; ++i) {
+            let firstData = data[0][i];
+            let secondData = data[1][i];
+            let thirdData = data[2][i];
+            let fourthData = data[3][i];
 
-                let secondShowDataInteger = secondData.substr(0, secondData.indexOf('.'));
-                let secondShowDataPoint = secondData.substr(secondData.indexOf('.'));
-                secondShowDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            a += '<tr>';
+            a += '<h4 class="ui image header">';
+            a += '<td id="firstData'+i+'">' + firstData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '</h4>';
+            a += '<td id="secondData'+i+'">' + secondData + '</td>';
+            // a += '<td id="secondData">' + secondData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '<td id="thirdData'+i+'">' + thirdData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '<td id="fourthData'+i+'">' + fourthData + '</td>';
+            // a += '<td id="fourthData">' + fourthData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '</tr>';
 
-                let thirdShowDataInteger = fourthData.substr(0, fourthData.indexOf('.'));
-                let thirdShowDataPoint = fourthData.substr(fourthData.indexOf('.'));
-                thirdShowDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-                cell1.innerHTML = firstData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                // cell2.innerHTML = secondData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                cell2.innerHTML = secondShowDataInteger + secondShowDataPoint;
-                cell3.innerHTML = thirdData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                // cell4.innerHTML = fourthData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                cell4.innerHTML = thirdShowDataInteger + thirdShowDataPoint;
-              }
-            }
-          } else if (frag == 1) {
-            for (let i = 0; i < 30; ++i) {
-              for (let j = 0; j < 4; ++j) {
-                let showData = data[j][i];
-                  let showDataInteger = showData.substr(0, showData.indexOf('.'));
-                  let showDataPoint = showData.substr(showData.indexOf('.'));
-                  showDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                  my_tbody.rows[i].cells[j].innerHTML = showDataInteger + showDataPoint;
-                  // my_tbody.rows[i].cells[j].innerHTML = showData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              }
-            }
           }
+          $("#tableBody").append(a);
         },
         error: function (data) {
           alert("데이터 출력 중 에러가 발생하였습니다.");
@@ -103,16 +89,26 @@
         data: {"targetData": targetData, "target": target, "sequence": sequence},
         success: function (data) {
           // 성공시
-          for (let i = 0; i < 30; ++i) {
-            for (let j = 0; j < 4; ++j) {
-              let showData = data[j][i];
-              // let showDataInteger = showData.substr(0, showData.indexOf('.'));
-              // let showDataPoint = showData.substr(showData.indexOf('.'));
-              // showDataInteger.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              // my_tbody.rows[i].cells[j].innerHTML = showDataInteger + showDataPoint;
-              my_tbody.rows[i].cells[j].innerHTML = showData.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
+          $("#tableBody").empty();
+          let a = "";
+
+          for (let i = 0 ; i < 30 ; ++i) {
+            let firstData = data[0][i];
+            let secondData = data[1][i];
+            let thirdData = data[2][i];
+            let fourthData = data[3][i];
+
+            a += '<tr>';
+            a += '<td id="firstData'+i+'">' + firstData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '<td id="secondData'+i+'">' + secondData + '</td>';
+            // a += '<td id="secondData">' + secondData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '<td id="thirdData'+i+'">' + thirdData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '<td id="fourthData'+i+'">' + fourthData + '</td>';
+            // a += '<td id="fourthData">' + fourthData.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+            a += '</tr>';
+
           }
+          $("#tableBody").append(a);
         },
         error: function (data) {
           alert("정렬에 실패하였습니다.");
@@ -135,6 +131,7 @@
       });
     }
 
+    // 테이블 내 검색
     function onSearch() {
       let search = document.getElementById("search").value;
       let selectOption = document.getElementById("searchKinds");
@@ -145,17 +142,41 @@
         url: "searchData", // 서치 메소드 호출
         data: {"searchKinds" : selectOption, "search" : search},
         success: function (data) {
-            if (data == "err") {
-                alert("없는 데이터 입니다.");
-                return;
-            } else {
-                for (let i = 0; i < 120; i++) {
-                    let str = document.getElementsByTagName('td')[val].childNodes[0].nodeValue;
-                    if (str == data) {
-                        console.log("오!!");
-                    }
+          if (data == "err") {
+            console.log(data);
+            alert("없는 데이터 입니다.");
+            return;
+          } else {
+            // console.log(data);
+            // alert("검색 데이터는 " + data + "입니다.");
+            for (let i = 0; i < 30; i++) {
+              if (selectOption == "bidsPrice") {
+                let str = document.getElementById("firstData"+i+"").innerText;
+                if (str.replace(/,/g,"") == data) {
+                  let dataId = document.getElementById("firstData"+i+"");
+                  dataId.style.color = "#f00";
                 }
+              } else if (selectOption == "bidsQuantity") {
+                let str = document.getElementById("secondData"+i+"").innerText;
+                if (str.replace(/,/g,"") == data) {
+                  let dataId = document.getElementById("secondData"+i+"");
+                  dataId.style.color = "#f00";
+                }
+              } else if (selectOption == "asksPrice") {
+                let str = document.getElementById("thirdData"+i+"").innerText;
+                if (str.replace(/,/g,"") == data) {
+                  let dataId = document.getElementById("thirdData"+i+"");
+                  dataId.style.color = "#f00";
+                }
+              } else {
+                let str = document.getElementById("fourthData"+i+"").innerText;
+                if (str.replace(/,/g,"") == data) {
+                  let dataId = document.getElementById("fourthData"+i+"");
+                  dataId.style.color = "#f00";
+                }
+              }
             }
+          }
         },
         error: function (data) {
           alert("검색에 실패 하였습니다.");
@@ -172,17 +193,10 @@
     <div class="container-fluid ml-10">
       <h1 class="mt-4" id="coinTitle">Order_book</h1>
       <div class="card mb-4">
-        <div>
-<!--          <input type="text" id="inputCoin" placeholder="주문통화를 입력하세요." style="width: 15%">-->
-<!--          <input type="text" id="payMent" placeholder="결제통화를 입력하세요." value="KRW" style="width: 15%">-->
-<!--          <input type="button" value="검색" style="width: 5%" onclick="coinSearch()">-->
-<!--          <input type="button" value="엑셀" style="width: 5%" onclick="excel()">-->
-        </div>
-<!--        <input type="text" id="search" placeholder="검색할 데이터 입력" style="width: 15%">-->
-<!--        <input type="button" value="테이블 내 검색" style="width: 7%" onclick="onSearch()">-->
         <div class="card-body">
           <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" border="1">
+<!--            <table class="table-users" id="dataTable">-->
               <thead>
               <tr>
                 <td><input type="text" id="inputCoin" placeholder="주문통화를 입력하세요." style="width: 97%;"></td>
@@ -192,7 +206,7 @@
               </tr>
               <tr>
                 <td>
-                  <select id="searchKinds">
+                  <select id="searchKinds" style="width: 100%">
                     <option value="bidsPrice">매수 거래가</option>
                     <option value="bidsQuantity">매수 수량</option>
                     <option value="asksPrice">매도 거래가</option>
