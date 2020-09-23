@@ -28,29 +28,25 @@ public class MainController {
   private HashMap<Integer, String> bidsPriceHashMap = new HashMap<>();
   private HashMap<Integer, String> bidsQuantityHashMap = new HashMap<>();
 
-
   private ArrayList<HashMap<Integer, String>> returnData = new ArrayList<>();
 
+  private static final String BASE_API_URL = "https://api.bithumb.com/public/orderbook/";
 
-  private final String BASE_API_URL = "https://api.bithumb.com/public/orderbook/";
+  private static final String UPPERCASE_ASC = "ASC";
+  private static final String LOWERCASE_ASC = "asc";
+  private static final String UPPERCASE_DESC = "DESC";
+  private static final String LOWERCASE_DESC = "desc";
 
-  private final String UPPERCASE_ASC = "ASC";
-  private final String LOWERCASE_ASC = "asc";
-  private final String UPPERCASE_DESC = "DESC";
-  private final String LOWERCASE_DESC = "desc";
+  private static final String BIDS = "bids";
+  private static final String ASKS = "asks";
 
-  private final String BIDS = "bids";
-  private final String ASKS = "asks";
+  private static final String BIDS_PRICE = "bidsPrice";
+  private static final String BIDS_QUANTITY = "bidsQuantity";
+  private static final String ASKS_PRICE = "asksPrice";
+  private static final String ASKS_QUANTITY = "asksQuantity";
 
-  private final String BIDS_PRICE = "bidsPrice";
-  private final String BIDS_QUANTITY = "bidsQuantity";
-  private final String ASKS_PRICE = "asksPrice";
-  private final String ASKS_QUANTITY = "asksQuantity";
-
-
-
-  private final String PRICE = "price";
-  private final String QUANTITY = "quantity";
+  private static final String PRICE = "price";
+  private static final String QUANTITY = "quantity";
 
   private String sortSequence = null;
 
@@ -119,7 +115,6 @@ public class MainController {
           asksQuantityHashMap.put(asksIndex, asksQuantity);
 //          commaAsksPrice.put(asksIndex, format.format(asksPrice));
 //          commaAsksQuantity.put(asksIndex, format.format(asksQuantity));
-
         }
 
         for (int bidsIndex = 0; bidsIndex < bidsJsonArray.size(); bidsIndex++) {
@@ -146,17 +141,19 @@ public class MainController {
       } else {
         throw  new NullPointerException();
       }
-      
     } catch (MalformedURLException e) {
       System.out.println("URL을 확인해 주세요.");
+      return null;
     } catch (IOException e) {
       System.out.println("데이터를 확인해 주세요.");
+      return null;
     } catch (ParseException e) {
       System.out.println("JSON 파싱에 실패 하였였습니다.");
+      return null;
     }catch (NullPointerException e) {
       System.out.println("파라미터 값을 확인해 주세요.");
+      return null;
     }
-
     return returnData;
   }
 
@@ -213,10 +210,8 @@ public class MainController {
     // 오름차순인지, 내림차순인지 확인하고 sort를 호출한다.
     if (sortSequence.equals(UPPERCASE_ASC) || sortSequence.equals(LOWERCASE_ASC)) {
       sortArrayList.sort(Comparator.naturalOrder());
-//        Collections.sort(sortArrayList, new Desc);
     } else if (sortSequence.equals(UPPERCASE_DESC) || sortSequence.equals(LOWERCASE_DESC)) {
       sortArrayList.sort(Comparator.reverseOrder());
-//        Collections.sort(sortArrayList);
     }
 
     if (standardData.equals(BIDS)) {
