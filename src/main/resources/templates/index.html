@@ -162,7 +162,8 @@
       }
       $.ajax({
         type: "get",
-        url: "searchData", // 서치 메소드 호출
+        // url: "searchData", // 서치 메소드 호출
+        url: "searchTest", // 서치 메소드 호출
         data: {"searchKinds" : selectOption, "search" : search},
         success: function (data) {
           if (data == "err") {
